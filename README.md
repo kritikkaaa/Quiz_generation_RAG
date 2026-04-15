@@ -19,9 +19,11 @@ User → FastAPI → /upload → Background Job → Chunking → Embeddings → 
 - Validation: Pydantic
 
 ## Repository Structure
-.
+
 ├── main.py              # FastAPI application (API layer)
+
 ├── rag_banao_tech.py    # Core RAG pipeline
+
 └── README.md
 
 ## Workflow
@@ -32,13 +34,17 @@ User → FastAPI → /upload → Background Job → Chunking → Embeddings → 
 ## API Endpoints
 
 POST /upload
+
 Upload one or more PDF/TXT files. Processing happens asynchronously.
 
 POST /generate-quiz
+
 Request Body: {"topic": "Biology", "difficulty": "easy"}
+
 Response: Returns structured MCQs from retrieved context
 
 GET /retrieve
+
 Query parameter: ?topic=Biology - Returns top retrieved chunks for debugging.
 
 ## Key Features
@@ -55,7 +61,6 @@ Query parameter: ?topic=Biology - Returns top retrieved chunks for debugging.
 
 1. Clone Repository
 git clone <https://github.com/kritikkaaa/Quiz_generation_RAG>
-cd <Quiz_generation_RAG>
 
 2. Install Dependencies
 pip install fastapi uvicorn chromadb sentence-transformers transformers langchain-text-splitters rank_bm25 pypdf python-multipart
@@ -63,8 +68,7 @@ pip install fastapi uvicorn chromadb sentence-transformers transformers langchai
 3. Run the API
 uvicorn main:app --reload
 
-4. Access API Docs
-http://127.0.0.1:8000/docs
+5. Access API Docs
 
 ## Evaluation Criteria Mapping
 
@@ -79,12 +83,15 @@ http://127.0.0.1:8000/docs
 ## Design Decisions
 
 Chunk Size (500 chars, 90 overlap):
+
 500 characters fits ~3–5 sentences — enough context for a single concept without diluting the embedding vector with unrelated material. The 90-character overlap ensures a sentence split across a chunk boundary doesn't vanish from retrieval entirely.
 
 Retrieval Failure Case Observed:
+
 When a query used different vocabulary than the document (e.g. query: "glucose production", document: "sugar synthesis"), dense retrieval scored poorly. Adding BM25 reranking on top of the dense results significantly helped because BM25 does exact keyword matching regardless of semantic similarity.
 
 Metric Tracked:
+
 End-to-end query latency (latency_ms in every /generate-quiz response). Typical range: 800–2000ms depending on LLM generation. Retrieval alone is under 100ms; the bulk of latency is dominated by FLAN-T5 generation.
 
 ## Author
